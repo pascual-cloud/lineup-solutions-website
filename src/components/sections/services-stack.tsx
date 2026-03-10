@@ -62,6 +62,8 @@ export function ServicesStack() {
   const cardsContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const isMobile = window.innerWidth < 768;
+
     const ctx = gsap.context(() => {
       // Heading
       gsap.fromTo(
@@ -77,43 +79,63 @@ export function ServicesStack() {
         }
       );
 
-      // Card stacking
       const cards = gsap.utils.toArray<HTMLElement>(".stack-card");
       const totalCards = cards.length;
 
-      cards.forEach((card, i) => {
-        const inner = card.querySelector<HTMLElement>(".stack-card-inner");
-        if (!inner) return;
+      if (isMobile) {
+        // Mobile: simple staggered fade-in with slide-up for each card
+        cards.forEach((card, i) => {
+          const inner = card.querySelector<HTMLElement>(".stack-card-inner");
+          if (!inner) return;
 
-        const isLast = i === totalCards - 1;
+          gsap.fromTo(
+            inner,
+            { y: 60, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              duration: 0.8,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: card,
+                start: "top 85%",
+              },
+            }
+          );
+        });
+      } else {
+        // Desktop: full sticky card stacking
+        cards.forEach((card, i) => {
+          const inner = card.querySelector<HTMLElement>(".stack-card-inner");
+          if (!inner) return;
 
-        // Pin each card except the last
-        if (!isLast) {
-          ScrollTrigger.create({
-            trigger: card,
-            start: () => `top ${80 + i * 12}px`, // each card pins slightly lower, creating offset
-            endTrigger: cardsContainerRef.current,
-            end: "bottom bottom",
-            pin: true,
-            pinSpacing: false,
-          });
+          const isLast = i === totalCards - 1;
 
-          // As user scrolls past this card (next card approaches), scale + fade + blur this one away
-          // Starts late (40%) so the card stays fully visible longer, fades only in the final stretch
-          gsap.to(inner, {
-            scale: 0.9 - i * 0.01,
-            opacity: 0,
-            filter: "blur(6px)",
-            ease: "power1.in",
-            scrollTrigger: {
-              trigger: cards[i + 1],
-              start: "top 40%",
-              end: "top 10%",
-              scrub: 0.5,
-            },
-          });
-        }
-      });
+          if (!isLast) {
+            ScrollTrigger.create({
+              trigger: card,
+              start: () => `top ${80 + i * 12}px`,
+              endTrigger: cardsContainerRef.current,
+              end: "bottom bottom",
+              pin: true,
+              pinSpacing: false,
+            });
+
+            gsap.to(inner, {
+              scale: 0.9 - i * 0.01,
+              opacity: 0,
+              filter: "blur(6px)",
+              ease: "power1.in",
+              scrollTrigger: {
+                trigger: cards[i + 1],
+                start: "top 40%",
+                end: "top 10%",
+                scrub: 0.5,
+              },
+            });
+          }
+        });
+      }
     }, sectionRef);
 
     return () => ctx.revert();
@@ -148,26 +170,26 @@ export function ServicesStack() {
       <div ref={cardsContainerRef} className="relative px-6">
         <div className="mx-auto max-w-7xl">
           {services.map((service) => (
-            <div key={service.number} className="stack-card mb-8">
+            <div key={service.number} className="stack-card mb-8 md:mb-8">
               <div
-                className="stack-card-inner overflow-hidden rounded-3xl border border-white/5 bg-[#0a0a0a]"
+                className="stack-card-inner overflow-hidden rounded-2xl border border-white/5 bg-[#0a0a0a] md:rounded-3xl"
               >
                 <div
-                  className="relative p-8 sm:p-10 lg:p-12"
+                  className="relative p-6 sm:p-10 lg:p-12"
                   style={{
                     background: `linear-gradient(135deg, ${service.color}08, transparent 50%)`,
                   }}
                 >
                   {/* Top row: icon + number */}
-                  <div className="mb-8 flex items-start justify-between">
+                  <div className="mb-6 flex items-start justify-between sm:mb-8">
                     <div
-                      className="flex h-14 w-14 items-center justify-center rounded-2xl"
+                      className="flex h-12 w-12 items-center justify-center rounded-xl sm:h-14 sm:w-14 sm:rounded-2xl"
                       style={{ background: `${service.color}15` }}
                     >
-                      <service.icon className="h-6 w-6" style={{ color: service.color }} />
+                      <service.icon className="h-5 w-5 sm:h-6 sm:w-6" style={{ color: service.color }} />
                     </div>
                     <span
-                      className="font-display text-7xl font-black leading-none sm:text-8xl lg:text-9xl"
+                      className="font-display text-6xl font-black leading-none sm:text-8xl lg:text-9xl"
                       style={{
                         background: `linear-gradient(180deg, ${service.color}12, transparent)`,
                         WebkitBackgroundClip: "text",
@@ -180,22 +202,22 @@ export function ServicesStack() {
                   </div>
 
                   {/* Content */}
-                  <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
                     <div>
-                      <h3 className="mb-4 font-display text-2xl font-black sm:text-3xl lg:text-4xl">
+                      <h3 className="mb-3 font-display text-xl font-black sm:mb-4 sm:text-3xl lg:text-4xl">
                         {service.title}
                       </h3>
-                      <p className="max-w-lg text-base leading-relaxed text-white/40">
+                      <p className="max-w-lg text-sm leading-relaxed text-white/40 sm:text-base">
                         {service.description}
                       </p>
                     </div>
 
                     {/* Features */}
-                    <div className="flex flex-wrap gap-3 lg:justify-end lg:self-end">
+                    <div className="flex flex-wrap gap-2 sm:gap-3 lg:justify-end lg:self-end">
                       {service.features.map((feat) => (
                         <span
                           key={feat}
-                          className="rounded-full border px-4 py-2 text-xs font-medium"
+                          className="rounded-full border px-3 py-1.5 text-[10px] font-medium sm:px-4 sm:py-2 sm:text-xs"
                           style={{
                             borderColor: `${service.color}25`,
                             color: `${service.color}`,

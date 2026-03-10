@@ -116,8 +116,8 @@ export function Hero() {
     return () => ctx.revert();
   }, []);
 
-  const headline = "We Build Software with AI";
-  const subtitle = "Faster. Smarter. Better.";
+  const headline = "Software That Ships.";
+  const subtitle = "Intelligently.";
 
   return (
     <section
@@ -168,7 +168,7 @@ export function Hero() {
             <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-purple" />
           </span>
           <span className="text-xs font-medium tracking-wide text-white/60">
-            AI-First Development &middot; 20+ Years &middot; El Salvador
+            Engineering Excellence &middot; El Salvador
           </span>
         </div>
 
@@ -184,13 +184,7 @@ export function Hero() {
               className="char inline-block"
               style={{ display: char === " " ? "inline" : "inline-block" }}
             >
-              {char === " "
-                ? "\u00A0"
-                : char === "A" && headline[i + 1] === "I"
-                  ? <span className="gradient-text">{char}</span>
-                  : char === "I" && headline[i - 1] === "A"
-                    ? <span className="gradient-text">{char}</span>
-                    : char}
+              {char === " " ? "\u00A0" : char}
             </span>
           ))}
           <br />
@@ -198,10 +192,10 @@ export function Hero() {
             {subtitle.split("").map((char, i) => (
               <span
                 key={`sub-${i}`}
-                className="char inline-block text-white/25"
+                className="char inline-block"
                 style={{ display: char === " " ? "inline" : "inline-block" }}
               >
-                {char === " " ? "\u00A0" : char}
+                {char === " " ? "\u00A0" : <span className="gradient-text">{char}</span>}
               </span>
             ))}
           </span>
@@ -211,7 +205,7 @@ export function Hero() {
         <div className="mb-8 flex items-center justify-center gap-3">
           <div className="h-[1px] w-16 bg-gradient-to-r from-transparent to-brand-purple/40" />
           <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/25">
-            Two Decades of Expertise
+            Where Experience Meets Innovation
           </span>
           <div className="h-[1px] w-16 bg-gradient-to-l from-transparent to-brand-orange/40" />
         </div>
@@ -221,9 +215,9 @@ export function Hero() {
           ref={subRef}
           className="mx-auto mb-12 max-w-2xl text-lg leading-relaxed text-white/40 sm:text-xl"
         >
-          Lineup Solutions combines two decades of software engineering
-          experience with AI-powered development to deliver digital products
-          faster and more reliably than traditional agencies.
+          We architect and ship digital products with precision — blending
+          deep engineering expertise with intelligent tooling to move faster
+          without compromising quality.
         </p>
 
         {/* CTAs */}
