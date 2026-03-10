@@ -2,7 +2,7 @@ import { Hero } from "@/components/sections/hero";
 import { LogosMarquee } from "@/components/sections/logos-marquee";
 import { ProblemSolution } from "@/components/sections/problem-solution";
 import { WhyAIFirst } from "@/components/sections/why-ai-first";
-import { HorizontalShowcase } from "@/components/sections/horizontal-showcase";
+import { ServicesStack } from "@/components/sections/services-stack";
 import { AboutSnapshot } from "@/components/sections/about-snapshot";
 import { TargetAudience } from "@/components/sections/target-audience";
 import { MarqueeSection } from "@/components/sections/marquee-section";
@@ -23,8 +23,8 @@ export default function Home() {
       {/* 3. Why AI-first (the 6 value props) */}
       <WhyAIFirst />
 
-      {/* 4. Services — horizontal scroll showcase */}
-      <HorizontalShowcase />
+      {/* 4. Services — sticky card stack */}
+      <ServicesStack />
 
       {/* 5. Who we are */}
       <AboutSnapshot />

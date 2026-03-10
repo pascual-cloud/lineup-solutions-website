@@ -1,0 +1,215 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Code2, Cpu, Globe, Layers, Sparkles } from "lucide-react";
+import Link from "next/link";
+
+gsap.registerPlugin(ScrollTrigger);
+
+const services = [
+  {
+    icon: Code2,
+    number: "01",
+    title: "Custom Software Development",
+    description:
+      "We design and build tailored software systems from the ground up — SaaS platforms, internal tools, enterprise systems, and fintech solutions. Every project is delivered using our AI-first process.",
+    features: ["SaaS Platforms", "Enterprise Systems", "Internal Tools", "Fintech Solutions"],
+    color: "#7B2FBE",
+    bg: "from-[#7B2FBE]/5 to-transparent",
+  },
+  {
+    icon: Layers,
+    number: "02",
+    title: "Platform Engineering",
+    description:
+      "From marketplaces to financial platforms to mobile apps, we architect scalable digital platforms built to handle real-world complexity and millions of users.",
+    features: ["Marketplaces", "Mobile Apps", "Financial Platforms", "Scalable Architecture"],
+    color: "#9333EA",
+    bg: "from-[#9333EA]/5 to-transparent",
+  },
+  {
+    icon: Sparkles,
+    number: "03",
+    title: "AI Integration & Automation",
+    description:
+      "We help companies embed AI into their existing products and workflows — from intelligent automation to custom AI features that give your product a competitive edge.",
+    features: ["Custom AI Features", "Intelligent Automation", "ML Pipelines", "AI-Powered UX"],
+    color: "#E31E24",
+    bg: "from-[#E31E24]/5 to-transparent",
+  },
+  {
+    icon: Cpu,
+    number: "04",
+    title: "Technology Consulting",
+    description:
+      "Not sure where to start? We help organizations choose the right architecture, technology stack, and product strategy — so you build the right thing, the right way.",
+    features: ["Architecture Design", "Tech Stack Selection", "Product Strategy", "Code Audits"],
+    color: "#F43F5E",
+    bg: "from-[#F43F5E]/5 to-transparent",
+  },
+  {
+    icon: Globe,
+    number: "05",
+    title: "Digital Transformation",
+    description:
+      "We modernize legacy systems and outdated processes with modern, AI-assisted technology — without disrupting your operations or losing your data.",
+    features: ["Legacy Modernization", "Cloud Migration", "Process Automation", "Zero Downtime"],
+    color: "#F7941D",
+    bg: "from-[#F7941D]/5 to-transparent",
+  },
+];
+
+export function ServicesStack() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const headingRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Heading
+      gsap.fromTo(
+        headingRef.current?.querySelectorAll(".stack-reveal") || [],
+        { y: 60, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1,
+          stagger: 0.12,
+          ease: "power4.out",
+          scrollTrigger: { trigger: headingRef.current, start: "top 85%" },
+        }
+      );
+
+      // Each card sticks and scales down as next card arrives
+      const cards = document.querySelectorAll<HTMLElement>(".stack-card");
+      cards.forEach((card, i) => {
+        ScrollTrigger.create({
+          trigger: card,
+          start: "top 80px",
+          end: "bottom 80px",
+          endTrigger: cards[cards.length - 1],
+          pin: i < cards.length - 1, // don't pin last card
+          pinSpacing: false,
+        });
+
+        // Scale down + dim as you scroll past
+        if (i < cards.length - 1) {
+          gsap.to(card.querySelector(".stack-card-inner"), {
+            scale: 0.92,
+            opacity: 0.5,
+            filter: "blur(2px)",
+            ease: "none",
+            scrollTrigger: {
+              trigger: cards[i + 1],
+              start: "top bottom",
+              end: "top 100px",
+              scrub: true,
+            },
+          });
+        }
+      });
+    }, sectionRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <section ref={sectionRef} className="relative pb-32">
+      {/* Heading */}
+      <div ref={headingRef} className="px-6 pt-32 pb-16">
+        <div className="mx-auto max-w-7xl">
+          <p className="stack-reveal mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-brand-red">
+            Services
+          </p>
+          <div className="stack-reveal flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+            <h2 className="font-display text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">
+              What we build.
+            </h2>
+            <Link
+              href="/services"
+              className="group flex items-center gap-2 text-sm font-medium text-white/40 transition-colors hover:text-white"
+            >
+              Explore all services
+              <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Stacking Cards */}
+      <div className="relative px-6">
+        <div className="mx-auto max-w-7xl space-y-6">
+          {services.map((service, i) => (
+            <div key={service.number} className="stack-card">
+              <div
+                className="stack-card-inner overflow-hidden rounded-3xl border border-white/5 bg-[#0a0a0a] transition-colors duration-500 hover:border-white/10"
+              >
+                <div className={`relative bg-gradient-to-br ${service.bg} p-8 sm:p-10 lg:p-12`}>
+                  {/* Top row: number + icon */}
+                  <div className="mb-8 flex items-start justify-between">
+                    <div
+                      className="flex h-14 w-14 items-center justify-center rounded-2xl"
+                      style={{ background: `${service.color}15` }}
+                    >
+                      <service.icon className="h-6 w-6" style={{ color: service.color }} />
+                    </div>
+                    <span
+                      className="font-display text-7xl font-black leading-none sm:text-8xl lg:text-9xl"
+                      style={{
+                        background: `linear-gradient(180deg, ${service.color}15, transparent)`,
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                      }}
+                    >
+                      {service.number}
+                    </span>
+                  </div>
+
+                  {/* Content */}
+                  <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+                    <div>
+                      <h3 className="mb-4 font-display text-2xl font-black sm:text-3xl lg:text-4xl">
+                        {service.title}
+                      </h3>
+                      <p className="max-w-lg text-base leading-relaxed text-white/40">
+                        {service.description}
+                      </p>
+                    </div>
+
+                    {/* Features */}
+                    <div className="flex flex-wrap gap-3 lg:justify-end lg:self-end">
+                      {service.features.map((feat) => (
+                        <span
+                          key={feat}
+                          className="rounded-full border px-4 py-2 text-xs font-medium transition-colors duration-300"
+                          style={{
+                            borderColor: `${service.color}20`,
+                            color: `${service.color}90`,
+                          }}
+                        >
+                          {feat}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Bottom line accent */}
+                  <div
+                    className="absolute bottom-0 left-0 h-[2px] w-full"
+                    style={{
+                      background: `linear-gradient(to right, ${service.color}40, transparent 60%)`,
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
