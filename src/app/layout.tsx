@@ -3,8 +3,7 @@ import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { SmoothScroll } from "@/components/smooth-scroll";
-import { ScrollLines } from "@/components/scroll-lines";
-import { FloatingParticles } from "@/components/floating-particles";
+import { CustomCursor } from "@/components/custom-cursor";
 
 export const metadata: Metadata = {
   title: "Lineup Solutions — AI-First Software Development",
@@ -34,8 +33,7 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className="antialiased grain">
         <SmoothScroll>
-          <ScrollLines />
-          <FloatingParticles />
+          <CustomCursor />
           <Navbar />
           {children}
           <Footer />
