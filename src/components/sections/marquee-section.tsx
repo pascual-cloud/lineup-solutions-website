@@ -39,35 +39,41 @@ export function MarqueeSection() {
     return () => ctx.revert();
   }, []);
 
-  const row1 = ["AI-First Development", "\u2022", "Custom Software", "\u2022", "20+ Years", "\u2022", "Platform Engineering", "\u2022", "El Salvador", "\u2022"];
-  const row2 = ["Scale Intelligently", "\u2022", "Digital Transformation", "\u2022", "Build Smarter", "\u2022", "AI Integration", "\u2022", "Build Faster", "\u2022"];
+  const row1 = ["AI-First Development", "/", "Custom Software", "/", "20+ Years", "/", "Platform Engineering", "/", "El Salvador", "/"];
+  const row2 = ["Scale Intelligently", "/", "Digital Transformation", "/", "Build Smarter", "/", "AI Integration", "/", "Build Faster", "/"];
 
   return (
-    <section ref={sectionRef} className="relative overflow-hidden py-16">
-      {/* Row 1 */}
-      <div ref={row1Ref} className="mb-3 flex whitespace-nowrap" style={{ transform: "translateX(50px)" }}>
+    <section ref={sectionRef} className="relative overflow-hidden py-20">
+      {/* Row 1 — outline text */}
+      <div ref={row1Ref} className="mb-4 flex whitespace-nowrap" style={{ transform: "translateX(50px)" }}>
         {[...row1, ...row1].map((word, i) => (
           <span
             key={i}
             className={`mx-4 font-display text-5xl font-black sm:text-7xl lg:text-8xl ${
-              word === "\u2022"
-                ? "gradient-text text-3xl sm:text-5xl"
-                : "text-white/[0.04]"
+              word === "/"
+                ? "text-white/[0.04] text-4xl sm:text-6xl"
+                : ""
             }`}
+            style={
+              word !== "/"
+                ? {
+                    WebkitTextStroke: "1px rgba(255,255,255,0.06)",
+                    WebkitTextFillColor: "transparent",
+                  }
+                : undefined
+            }
           >
             {word}
           </span>
         ))}
       </div>
-      {/* Row 2 — opposite direction */}
+      {/* Row 2 — filled but very dim */}
       <div ref={row2Ref} className="flex whitespace-nowrap" style={{ transform: "translateX(-200px)" }}>
         {[...row2, ...row2].map((word, i) => (
           <span
             key={i}
-            className={`mx-4 font-display text-5xl font-black sm:text-7xl lg:text-8xl ${
-              word === "\u2022"
-                ? "gradient-text text-3xl sm:text-5xl"
-                : "text-white/[0.04]"
+            className={`mx-4 font-display text-5xl font-black text-white/[0.03] sm:text-7xl lg:text-8xl ${
+              word === "/" ? "text-4xl sm:text-6xl" : ""
             }`}
           >
             {word}
