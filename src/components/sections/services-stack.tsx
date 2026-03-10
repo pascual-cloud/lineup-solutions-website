@@ -99,15 +99,16 @@ export function ServicesStack() {
           });
 
           // As user scrolls past this card (next card approaches), scale + fade + blur this one away
+          // Starts late (40%) so the card stays fully visible longer, fades only in the final stretch
           gsap.to(inner, {
-            scale: 0.85 - i * 0.02, // progressively smaller
+            scale: 0.9 - i * 0.01,
             opacity: 0,
-            filter: "blur(8px)",
-            ease: "none",
+            filter: "blur(6px)",
+            ease: "power1.in",
             scrollTrigger: {
               trigger: cards[i + 1],
-              start: "top 90%",
-              end: "top 15%",
+              start: "top 40%",
+              end: "top 10%",
               scrub: 0.5,
             },
           });
