@@ -17,7 +17,6 @@ const services = [
       "We design and build tailored software systems from the ground up — SaaS platforms, internal tools, enterprise systems, and fintech solutions. Every project is delivered using our AI-first process.",
     features: ["SaaS Platforms", "Enterprise Systems", "Internal Tools", "Fintech Solutions"],
     color: "#7B2FBE",
-    bg: "from-[#7B2FBE]/5 to-transparent",
   },
   {
     icon: Layers,
@@ -27,7 +26,6 @@ const services = [
       "From marketplaces to financial platforms to mobile apps, we architect scalable digital platforms built to handle real-world complexity and millions of users.",
     features: ["Marketplaces", "Mobile Apps", "Financial Platforms", "Scalable Architecture"],
     color: "#9333EA",
-    bg: "from-[#9333EA]/5 to-transparent",
   },
   {
     icon: Sparkles,
@@ -37,7 +35,6 @@ const services = [
       "We help companies embed AI into their existing products and workflows — from intelligent automation to custom AI features that give your product a competitive edge.",
     features: ["Custom AI Features", "Intelligent Automation", "ML Pipelines", "AI-Powered UX"],
     color: "#E31E24",
-    bg: "from-[#E31E24]/5 to-transparent",
   },
   {
     icon: Cpu,
@@ -47,7 +44,6 @@ const services = [
       "Not sure where to start? We help organizations choose the right architecture, technology stack, and product strategy — so you build the right thing, the right way.",
     features: ["Architecture Design", "Tech Stack Selection", "Product Strategy", "Code Audits"],
     color: "#F43F5E",
-    bg: "from-[#F43F5E]/5 to-transparent",
   },
   {
     icon: Globe,
@@ -57,13 +53,13 @@ const services = [
       "We modernize legacy systems and outdated processes with modern, AI-assisted technology — without disrupting your operations or losing your data.",
     features: ["Legacy Modernization", "Cloud Migration", "Process Automation", "Zero Downtime"],
     color: "#F7941D",
-    bg: "from-[#F7941D]/5 to-transparent",
   },
 ];
 
 export function ServicesStack() {
   const sectionRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
+  const cardsContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -81,30 +77,38 @@ export function ServicesStack() {
         }
       );
 
-      // Each card sticks and scales down as next card arrives
-      const cards = document.querySelectorAll<HTMLElement>(".stack-card");
-      cards.forEach((card, i) => {
-        ScrollTrigger.create({
-          trigger: card,
-          start: "top 80px",
-          end: "bottom 80px",
-          endTrigger: cards[cards.length - 1],
-          pin: i < cards.length - 1, // don't pin last card
-          pinSpacing: false,
-        });
+      // Card stacking
+      const cards = gsap.utils.toArray<HTMLElement>(".stack-card");
+      const totalCards = cards.length;
 
-        // Scale down + dim as you scroll past
-        if (i < cards.length - 1) {
-          gsap.to(card.querySelector(".stack-card-inner"), {
-            scale: 0.92,
-            opacity: 0.5,
-            filter: "blur(2px)",
+      cards.forEach((card, i) => {
+        const inner = card.querySelector<HTMLElement>(".stack-card-inner");
+        if (!inner) return;
+
+        const isLast = i === totalCards - 1;
+
+        // Pin each card except the last
+        if (!isLast) {
+          ScrollTrigger.create({
+            trigger: card,
+            start: () => `top ${80 + i * 12}px`, // each card pins slightly lower, creating offset
+            endTrigger: cardsContainerRef.current,
+            end: "bottom bottom",
+            pin: true,
+            pinSpacing: false,
+          });
+
+          // As user scrolls past this card (next card approaches), scale + fade + blur this one away
+          gsap.to(inner, {
+            scale: 0.85 - i * 0.02, // progressively smaller
+            opacity: 0,
+            filter: "blur(8px)",
             ease: "none",
             scrollTrigger: {
               trigger: cards[i + 1],
-              start: "top bottom",
-              end: "top 100px",
-              scrub: true,
+              start: "top 90%",
+              end: "top 15%",
+              scrub: 0.5,
             },
           });
         }
@@ -140,15 +144,20 @@ export function ServicesStack() {
       </div>
 
       {/* Stacking Cards */}
-      <div className="relative px-6">
-        <div className="mx-auto max-w-7xl space-y-6">
-          {services.map((service, i) => (
-            <div key={service.number} className="stack-card">
+      <div ref={cardsContainerRef} className="relative px-6">
+        <div className="mx-auto max-w-7xl">
+          {services.map((service) => (
+            <div key={service.number} className="stack-card mb-8">
               <div
-                className="stack-card-inner overflow-hidden rounded-3xl border border-white/5 bg-[#0a0a0a] transition-colors duration-500 hover:border-white/10"
+                className="stack-card-inner overflow-hidden rounded-3xl border border-white/5 bg-[#0a0a0a]"
               >
-                <div className={`relative bg-gradient-to-br ${service.bg} p-8 sm:p-10 lg:p-12`}>
-                  {/* Top row: number + icon */}
+                <div
+                  className="relative p-8 sm:p-10 lg:p-12"
+                  style={{
+                    background: `linear-gradient(135deg, ${service.color}08, transparent 50%)`,
+                  }}
+                >
+                  {/* Top row: icon + number */}
                   <div className="mb-8 flex items-start justify-between">
                     <div
                       className="flex h-14 w-14 items-center justify-center rounded-2xl"
@@ -159,7 +168,7 @@ export function ServicesStack() {
                     <span
                       className="font-display text-7xl font-black leading-none sm:text-8xl lg:text-9xl"
                       style={{
-                        background: `linear-gradient(180deg, ${service.color}15, transparent)`,
+                        background: `linear-gradient(180deg, ${service.color}12, transparent)`,
                         WebkitBackgroundClip: "text",
                         WebkitTextFillColor: "transparent",
                         backgroundClip: "text",
@@ -185,10 +194,10 @@ export function ServicesStack() {
                       {service.features.map((feat) => (
                         <span
                           key={feat}
-                          className="rounded-full border px-4 py-2 text-xs font-medium transition-colors duration-300"
+                          className="rounded-full border px-4 py-2 text-xs font-medium"
                           style={{
-                            borderColor: `${service.color}20`,
-                            color: `${service.color}90`,
+                            borderColor: `${service.color}25`,
+                            color: `${service.color}`,
                           }}
                         >
                           {feat}
@@ -197,11 +206,11 @@ export function ServicesStack() {
                     </div>
                   </div>
 
-                  {/* Bottom line accent */}
+                  {/* Bottom accent line */}
                   <div
                     className="absolute bottom-0 left-0 h-[2px] w-full"
                     style={{
-                      background: `linear-gradient(to right, ${service.color}40, transparent 60%)`,
+                      background: `linear-gradient(to right, ${service.color}50, transparent 60%)`,
                     }}
                   />
                 </div>
