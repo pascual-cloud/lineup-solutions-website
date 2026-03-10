@@ -104,13 +104,80 @@ export function ServicesStack() {
           );
         });
       } else {
-        // Desktop: full sticky card stacking
+        // Desktop: entrance animations + sticky card stacking
         cards.forEach((card, i) => {
           const inner = card.querySelector<HTMLElement>(".stack-card-inner");
           if (!inner) return;
 
+          const icon = inner.querySelector<HTMLElement>(".card-icon");
+          const number = inner.querySelector<HTMLElement>(".card-number");
+          const title = inner.querySelector<HTMLElement>(".card-title");
+          const desc = inner.querySelector<HTMLElement>(".card-desc");
+          const features = inner.querySelectorAll<HTMLElement>(".card-feature");
+          const accentLine = inner.querySelector<HTMLElement>(".card-accent");
+
           const isLast = i === totalCards - 1;
 
+          // Entrance: card slides up + inner content staggers in
+          const enterTl = gsap.timeline({
+            scrollTrigger: {
+              trigger: card,
+              start: "top 80%",
+              toggleActions: "play none none none",
+            },
+          });
+
+          enterTl.fromTo(
+            inner,
+            { y: 80, opacity: 0, scale: 0.97 },
+            { y: 0, opacity: 1, scale: 1, duration: 0.9, ease: "power3.out" }
+          );
+
+          enterTl.fromTo(
+            icon,
+            { scale: 0, rotation: -20 },
+            { scale: 1, rotation: 0, duration: 0.6, ease: "back.out(2)" },
+            0.2
+          );
+
+          enterTl.fromTo(
+            number,
+            { x: 40, opacity: 0 },
+            { x: 0, opacity: 1, duration: 0.8, ease: "power3.out" },
+            0.25
+          );
+
+          enterTl.fromTo(
+            title,
+            { y: 25, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" },
+            0.35
+          );
+
+          enterTl.fromTo(
+            desc,
+            { y: 20, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" },
+            0.45
+          );
+
+          enterTl.fromTo(
+            features,
+            { y: 15, opacity: 0, scale: 0.9 },
+            { y: 0, opacity: 1, scale: 1, duration: 0.5, stagger: 0.06, ease: "power3.out" },
+            0.5
+          );
+
+          if (accentLine) {
+            enterTl.fromTo(
+              accentLine,
+              { scaleX: 0, transformOrigin: "left" },
+              { scaleX: 1, duration: 0.8, ease: "power2.out" },
+              0.4
+            );
+          }
+
+          // Pin each card except the last
           if (!isLast) {
             ScrollTrigger.create({
               trigger: card,
@@ -121,6 +188,7 @@ export function ServicesStack() {
               pinSpacing: false,
             });
 
+            // Fade out as next card arrives
             gsap.to(inner, {
               scale: 0.9 - i * 0.01,
               opacity: 0,
@@ -183,13 +251,13 @@ export function ServicesStack() {
                   {/* Top row: icon + number */}
                   <div className="mb-6 flex items-start justify-between sm:mb-8">
                     <div
-                      className="flex h-12 w-12 items-center justify-center rounded-xl sm:h-14 sm:w-14 sm:rounded-2xl"
+                      className="card-icon flex h-12 w-12 items-center justify-center rounded-xl sm:h-14 sm:w-14 sm:rounded-2xl"
                       style={{ background: `${service.color}15` }}
                     >
                       <service.icon className="h-5 w-5 sm:h-6 sm:w-6" style={{ color: service.color }} />
                     </div>
                     <span
-                      className="font-display text-6xl font-black leading-none sm:text-8xl lg:text-9xl"
+                      className="card-number font-display text-6xl font-black leading-none sm:text-8xl lg:text-9xl"
                       style={{
                         background: `linear-gradient(180deg, ${service.color}12, transparent)`,
                         WebkitBackgroundClip: "text",
@@ -204,10 +272,10 @@ export function ServicesStack() {
                   {/* Content */}
                   <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
                     <div>
-                      <h3 className="mb-3 font-display text-xl font-black sm:mb-4 sm:text-3xl lg:text-4xl">
+                      <h3 className="card-title mb-3 font-display text-xl font-black sm:mb-4 sm:text-3xl lg:text-4xl">
                         {service.title}
                       </h3>
-                      <p className="max-w-lg text-sm leading-relaxed text-white/40 sm:text-base">
+                      <p className="card-desc max-w-lg text-sm leading-relaxed text-white/40 sm:text-base">
                         {service.description}
                       </p>
                     </div>
@@ -217,7 +285,7 @@ export function ServicesStack() {
                       {service.features.map((feat) => (
                         <span
                           key={feat}
-                          className="rounded-full border px-3 py-1.5 text-[10px] font-medium sm:px-4 sm:py-2 sm:text-xs"
+                          className="card-feature rounded-full border px-3 py-1.5 text-[10px] font-medium sm:px-4 sm:py-2 sm:text-xs"
                           style={{
                             borderColor: `${service.color}25`,
                             color: `${service.color}`,
@@ -231,7 +299,7 @@ export function ServicesStack() {
 
                   {/* Bottom accent line */}
                   <div
-                    className="absolute bottom-0 left-0 h-[2px] w-full"
+                    className="card-accent absolute bottom-0 left-0 h-[2px] w-full"
                     style={{
                       background: `linear-gradient(to right, ${service.color}50, transparent 60%)`,
                     }}
