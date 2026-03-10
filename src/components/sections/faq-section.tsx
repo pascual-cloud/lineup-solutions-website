@@ -57,8 +57,8 @@ function FAQItem({
       gsap.to(answerRef.current, {
         height: isOpen ? "auto" : 0,
         opacity: isOpen ? 1 : 0,
-        duration: 0.4,
-        ease: "power2.inOut",
+        duration: 0.5,
+        ease: "power3.inOut",
       });
     }
   }, [isOpen]);
@@ -74,8 +74,8 @@ function FAQItem({
         </span>
         <div
           className={cn(
-            "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-white/10 transition-all duration-300",
-            isOpen && "rotate-45 border-brand-purple/50 bg-brand-purple/10"
+            "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-white/10 transition-all duration-500",
+            isOpen && "rotate-45 border-brand-purple/50 bg-brand-purple/10 shadow-[0_0_20px_rgba(123,47,190,0.2)]"
           )}
         >
           <Plus className="h-4 w-4 text-white/40" />
@@ -93,6 +93,7 @@ function FAQItem({
 export function FAQSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const handleToggle = useCallback((index: number) => {
@@ -101,12 +102,15 @@ export function FAQSection() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      // Heading with blur reveal
+      const headingEls = headingRef.current?.querySelectorAll(".faq-reveal") || [];
       gsap.fromTo(
-        headingRef.current?.querySelectorAll(".faq-reveal") || [],
-        { y: 50, opacity: 0 },
+        headingEls,
+        { y: 50, opacity: 0, filter: "blur(8px)" },
         {
           y: 0,
           opacity: 1,
+          filter: "blur(0px)",
           duration: 1,
           stagger: 0.12,
           ease: "power3.out",
@@ -114,16 +118,33 @@ export function FAQSection() {
         }
       );
 
+      // FAQ items slide up individually with stagger
+      const items = listRef.current?.querySelectorAll(".faq-item") || [];
       gsap.fromTo(
-        ".faq-item",
-        { y: 30, opacity: 0 },
+        items,
+        { y: 40, opacity: 0, x: -20 },
         {
           y: 0,
           opacity: 1,
-          duration: 0.6,
+          x: 0,
+          duration: 0.7,
           stagger: 0.08,
           ease: "power3.out",
-          scrollTrigger: { trigger: ".faq-item", start: "top 90%" },
+          scrollTrigger: { trigger: listRef.current, start: "top 85%" },
+        }
+      );
+
+      // Subtle divider line draws across each item
+      const dividers = listRef.current?.querySelectorAll(".faq-item > div") || [];
+      gsap.fromTo(
+        dividers,
+        { borderBottomColor: "rgba(255,255,255,0)" },
+        {
+          borderBottomColor: "rgba(255,255,255,0.05)",
+          duration: 0.6,
+          stagger: 0.08,
+          ease: "power2.out",
+          scrollTrigger: { trigger: listRef.current, start: "top 85%" },
         }
       );
     }, sectionRef);
@@ -145,7 +166,7 @@ export function FAQSection() {
         </div>
 
         {/* FAQ Items */}
-        <div>
+        <div ref={listRef}>
           {faqs.map((faq, i) => (
             <div key={i} className="faq-item">
               <FAQItem

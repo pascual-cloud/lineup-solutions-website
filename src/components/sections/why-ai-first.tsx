@@ -138,21 +138,21 @@ function TiltCard({
 
       {/* Icon */}
       <div
-        className={`mb-6 inline-flex rounded-xl bg-gradient-to-br ${card.gradient} p-3 shadow-lg`}
+        className={`ai-icon mb-6 inline-flex rounded-xl bg-gradient-to-br ${card.gradient} p-3 shadow-lg`}
         style={{ boxShadow: `0 8px 30px ${card.color}30` }}
       >
         <card.icon className="h-5 w-5 text-white" />
       </div>
 
       {/* Content */}
-      <h3 className="mb-3 text-xl font-bold">{card.title}</h3>
-      <p className="text-sm leading-relaxed text-white/40">
+      <h3 className="ai-title mb-3 text-xl font-bold">{card.title}</h3>
+      <p className="ai-desc text-sm leading-relaxed text-white/40">
         {card.description}
       </p>
 
       {/* Bottom gradient line on hover */}
       <div
-        className="absolute bottom-0 left-0 h-[2px] w-full origin-left scale-x-0 transition-transform duration-500 group-hover:scale-x-100"
+        className="ai-line absolute bottom-0 left-0 h-[2px] w-full origin-left scale-x-0 transition-transform duration-500 group-hover:scale-x-100"
         style={{
           background: `linear-gradient(to right, ${card.color}, transparent)`,
         }}
@@ -177,42 +177,6 @@ export function WhyAIFirst() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Heading reveal with text split feel
-      gsap.fromTo(
-        headingRef.current?.querySelectorAll(".reveal") || [],
-        { y: 80, opacity: 0, rotateX: 20 },
-        {
-          y: 0,
-          opacity: 1,
-          rotateX: 0,
-          duration: 1.2,
-          stagger: 0.15,
-          ease: "power4.out",
-          scrollTrigger: {
-            trigger: headingRef.current,
-            start: "top 85%",
-          },
-        }
-      );
-
-      // Cards staggered entrance with scale
-      gsap.fromTo(
-        cardsRef.current?.children || [],
-        { y: 100, opacity: 0, scale: 0.9 },
-        {
-          y: 0,
-          opacity: 1,
-          scale: 1,
-          duration: 0.8,
-          stagger: 0.08,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: cardsRef.current,
-            start: "top 80%",
-          },
-        }
-      );
-
       // Animated line that draws across
       gsap.fromTo(
         lineRef.current,
@@ -227,6 +191,96 @@ export function WhyAIFirst() {
           },
         }
       );
+
+      // Heading reveal with blur + rotateX
+      const headingEls = headingRef.current?.querySelectorAll(".reveal") || [];
+      gsap.fromTo(
+        headingEls,
+        { y: 80, opacity: 0, rotateX: 25, filter: "blur(8px)" },
+        {
+          y: 0,
+          opacity: 1,
+          rotateX: 0,
+          filter: "blur(0px)",
+          duration: 1.2,
+          stagger: 0.15,
+          ease: "power4.out",
+          scrollTrigger: {
+            trigger: headingRef.current,
+            start: "top 85%",
+          },
+        }
+      );
+
+      // Cards — individual entrance with timeline per card
+      const cards = cardsRef.current?.children || [];
+      Array.from(cards).forEach((card, i) => {
+        const icon = card.querySelector(".ai-icon");
+        const title = card.querySelector(".ai-title");
+        const desc = card.querySelector(".ai-desc");
+        const bottomLine = card.querySelector(".ai-line");
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: card,
+            start: "top 85%",
+          },
+        });
+
+        tl.fromTo(
+          card,
+          { y: 80, opacity: 0, scale: 0.9 },
+          { y: 0, opacity: 1, scale: 1, duration: 0.8, ease: "power3.out", delay: i * 0.06 }
+        );
+
+        if (icon) {
+          tl.fromTo(
+            icon,
+            { scale: 0, rotation: -15 },
+            { scale: 1, rotation: 0, duration: 0.5, ease: "back.out(2)" },
+            0.2 + i * 0.06
+          );
+        }
+
+        if (title) {
+          tl.fromTo(
+            title,
+            { y: 15, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" },
+            0.3 + i * 0.06
+          );
+        }
+
+        if (desc) {
+          tl.fromTo(
+            desc,
+            { y: 10, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" },
+            0.4 + i * 0.06
+          );
+        }
+
+        if (bottomLine) {
+          tl.fromTo(
+            bottomLine,
+            { scaleX: 0, transformOrigin: "left" },
+            { scaleX: 1, duration: 0.6, ease: "power2.out" },
+            0.35 + i * 0.06
+          );
+        }
+      });
+
+      // Heading parallax — subtle lift on scroll
+      gsap.to(headingRef.current, {
+        y: -30,
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1,
+        },
+      });
     }, sectionRef);
 
     return () => ctx.revert();

@@ -13,6 +13,7 @@ export function MarqueeSection() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+      // Row 1 scrolls left with speed variation
       gsap.to(row1Ref.current, {
         x: -300,
         ease: "none",
@@ -24,6 +25,7 @@ export function MarqueeSection() {
         },
       });
 
+      // Row 2 scrolls right
       gsap.to(row2Ref.current, {
         x: 200,
         ease: "none",
@@ -32,6 +34,54 @@ export function MarqueeSection() {
           start: "top bottom",
           end: "bottom top",
           scrub: 0.5,
+        },
+      });
+
+      // Rows fade/scale in when entering viewport
+      [row1Ref.current, row2Ref.current].forEach((row, i) => {
+        if (!row) return;
+        gsap.fromTo(
+          row,
+          { opacity: 0, scale: 0.95, filter: "blur(10px)" },
+          {
+            opacity: 1,
+            scale: 1,
+            filter: "blur(0px)",
+            duration: 1.2,
+            delay: i * 0.15,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top 85%",
+            },
+          }
+        );
+      });
+
+      // Scrub-driven opacity: text gets brighter as you scroll through center
+      gsap.fromTo(
+        sectionRef.current,
+        { opacity: 0.4 },
+        {
+          opacity: 1,
+          ease: "none",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 80%",
+            end: "top 30%",
+            scrub: true,
+          },
+        }
+      );
+
+      gsap.to(sectionRef.current, {
+        opacity: 0.4,
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "bottom 70%",
+          end: "bottom 20%",
+          scrub: true,
         },
       });
     }, sectionRef);

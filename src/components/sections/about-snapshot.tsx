@@ -21,7 +21,7 @@ export function AboutSnapshot() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // Animated line
+      // Animated line draws from center
       gsap.fromTo(
         lineRef.current,
         { scaleX: 0 },
@@ -36,10 +36,11 @@ export function AboutSnapshot() {
         }
       );
 
-      // Text reveal
+      // Text reveal — each line slides up with blur
+      const textEls = textRef.current?.querySelectorAll(".about-reveal") || [];
       gsap.fromTo(
-        textRef.current?.querySelectorAll(".about-reveal") || [],
-        { y: 60, opacity: 0, filter: "blur(5px)" },
+        textEls,
+        { y: 60, opacity: 0, filter: "blur(8px)" },
         {
           y: 0,
           opacity: 1,
@@ -54,25 +55,63 @@ export function AboutSnapshot() {
         }
       );
 
-      // Stats with scale + rotation entrance
+      // Stats — each card has individual entrance
       const statItems = statsRef.current?.children || [];
-      gsap.fromTo(
-        statItems,
-        { y: 80, opacity: 0, scale: 0.8, rotateY: 15 },
-        {
-          y: 0,
-          opacity: 1,
-          scale: 1,
-          rotateY: 0,
-          duration: 0.9,
-          stagger: 0.12,
-          ease: "back.out(1.2)",
+      Array.from(statItems).forEach((stat, i) => {
+        const value = stat.querySelector(".stat-value");
+        const label = stat.querySelector(".stat-label");
+        const topLine = stat.querySelector(".stat-line");
+
+        const tl = gsap.timeline({
           scrollTrigger: {
-            trigger: statsRef.current,
-            start: "top 80%",
+            trigger: stat,
+            start: "top 85%",
           },
+        });
+
+        // Card entrance — alternating scale/rotate
+        tl.fromTo(
+          stat,
+          { y: 60, opacity: 0, scale: 0.8, rotateY: i % 2 === 0 ? 15 : -15 },
+          {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            rotateY: 0,
+            duration: 0.9,
+            ease: "back.out(1.2)",
+            delay: i * 0.1,
+          }
+        );
+
+        // Value punches in
+        if (value) {
+          tl.fromTo(
+            value,
+            { scale: 0.5, opacity: 0 },
+            { scale: 1, opacity: 1, duration: 0.7, ease: "back.out(2)" },
+            0.3 + i * 0.1
+          );
         }
-      );
+
+        if (label) {
+          tl.fromTo(
+            label,
+            { y: 10, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" },
+            0.5 + i * 0.1
+          );
+        }
+
+        if (topLine) {
+          tl.fromTo(
+            topLine,
+            { scaleX: 0, transformOrigin: "left" },
+            { scaleX: 1, duration: 0.6, ease: "power2.out" },
+            0.4 + i * 0.1
+          );
+        }
+      });
     }, sectionRef);
 
     return () => ctx.revert();
@@ -125,7 +164,7 @@ export function AboutSnapshot() {
                   }}
                 />
                 <div
-                  className="mb-2 font-display text-4xl font-black sm:text-5xl"
+                  className="stat-value mb-2 font-display text-4xl font-black sm:text-5xl"
                   style={{
                     background: `linear-gradient(135deg, ${stat.color}, #fff)`,
                     WebkitBackgroundClip: "text",
@@ -135,11 +174,11 @@ export function AboutSnapshot() {
                 >
                   {stat.value}
                 </div>
-                <div className="text-sm text-white/40">{stat.label}</div>
+                <div className="stat-label text-sm text-white/40">{stat.label}</div>
 
                 {/* Top line accent */}
                 <div
-                  className="absolute top-0 left-0 h-[1px] w-full origin-left scale-x-0 transition-transform duration-500 group-hover:scale-x-100"
+                  className="stat-line absolute top-0 left-0 h-[1px] w-full origin-left scale-x-0 transition-transform duration-500 group-hover:scale-x-100"
                   style={{ background: `linear-gradient(to right, ${stat.color}, transparent)` }}
                 />
               </div>
