@@ -104,78 +104,12 @@ export function ServicesStack() {
           );
         });
       } else {
-        // Desktop: entrance animations + sticky card stacking
+        // Desktop: sticky card stacking with clean transitions
         cards.forEach((card, i) => {
           const inner = card.querySelector<HTMLElement>(".stack-card-inner");
           if (!inner) return;
 
-          const icon = inner.querySelector<HTMLElement>(".card-icon");
-          const number = inner.querySelector<HTMLElement>(".card-number");
-          const title = inner.querySelector<HTMLElement>(".card-title");
-          const desc = inner.querySelector<HTMLElement>(".card-desc");
-          const features = inner.querySelectorAll<HTMLElement>(".card-feature");
-          const accentLine = inner.querySelector<HTMLElement>(".card-accent");
-
           const isLast = i === totalCards - 1;
-
-          // Entrance: card slides up + inner content staggers in
-          const enterTl = gsap.timeline({
-            scrollTrigger: {
-              trigger: card,
-              start: "top 80%",
-              toggleActions: "play none none none",
-            },
-          });
-
-          enterTl.fromTo(
-            inner,
-            { y: 80, opacity: 0, scale: 0.97 },
-            { y: 0, opacity: 1, scale: 1, duration: 0.9, ease: "power3.out" }
-          );
-
-          enterTl.fromTo(
-            icon,
-            { scale: 0, rotation: -20 },
-            { scale: 1, rotation: 0, duration: 0.6, ease: "back.out(2)" },
-            0.2
-          );
-
-          enterTl.fromTo(
-            number,
-            { x: 40, opacity: 0 },
-            { x: 0, opacity: 1, duration: 0.8, ease: "power3.out" },
-            0.25
-          );
-
-          enterTl.fromTo(
-            title,
-            { y: 25, opacity: 0 },
-            { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" },
-            0.35
-          );
-
-          enterTl.fromTo(
-            desc,
-            { y: 20, opacity: 0 },
-            { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" },
-            0.45
-          );
-
-          enterTl.fromTo(
-            features,
-            { y: 15, opacity: 0, scale: 0.9 },
-            { y: 0, opacity: 1, scale: 1, duration: 0.5, stagger: 0.06, ease: "power3.out" },
-            0.5
-          );
-
-          if (accentLine) {
-            enterTl.fromTo(
-              accentLine,
-              { scaleX: 0, transformOrigin: "left" },
-              { scaleX: 1, duration: 0.8, ease: "power2.out" },
-              0.4
-            );
-          }
 
           // Pin each card except the last
           if (!isLast) {
@@ -188,15 +122,16 @@ export function ServicesStack() {
               pinSpacing: false,
             });
 
-            // Fade out as next card arrives
+            // Fade + scale + blur out as next card arrives
             gsap.to(inner, {
-              scale: 0.9 - i * 0.01,
+              scale: 0.92 - i * 0.01,
               opacity: 0,
-              filter: "blur(6px)",
+              filter: "blur(8px)",
+              y: -20,
               ease: "power1.in",
               scrollTrigger: {
                 trigger: cards[i + 1],
-                start: "top 40%",
+                start: "top 50%",
                 end: "top 10%",
                 scrub: 0.5,
               },
